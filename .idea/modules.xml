@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ArithmeticExpressionTokenizer/GCalendarInterpreter.iml" filepath="$PROJECT_DIR$/ArithmeticExpressionTokenizer/GCalendarInterpreter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GCalendarInterpreter/GCalendarInterpreter.iml" filepath="$PROJECT_DIR$/GCalendarInterpreter/GCalendarInterpreter.iml" />
     </modules>
   </component>
 </project>
