@@ -1,3 +1,4 @@
+
 package com.gcalendarinterpreter.controller;
 
 import com.gcalendarinterpreter.model.Token;
@@ -7,7 +8,6 @@ import com.gcalendarinterpreter.view.LexicalAnalyzerView;
 
 import javax.swing.*;
 import javax.swing.text.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -43,8 +43,7 @@ public class LexicalAnalyzerController {
         tokenizer.add(",", Token.COMMA);
         tokenizer.add("\\b(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\\d{2} ([01][0-9]|2[0-3]):[0-5][0-9]\\b", Token.DATE);
         tokenizer.add("[“\"][^“”\"]*[”\"]", Token.STRING);
-        tokenizer.add("#[0-9a-fA-F]{6}\\b", Token.HEX);
-        tokenizer.add("##.*?##", Token.COMMENT);
+        tokenizer.add("#[0-9a-fA-F]{6}\\b", Token.COLOR);
     }
 
     private void initController() {
@@ -69,10 +68,9 @@ public class LexicalAnalyzerController {
         doc.setCharacterAttributes(0, text.length(), new SimpleAttributeSet(), true);
 
         try {
-
             tokenizer.tokenize(text);
             view.resultLabel.setText("Sintaxis correcta");
-            colorTokens(doc);
+            displayTokens();
         } catch (LexerException ex) {
             view.resultLabel.setText("Sintaxis incorrecta: " + ex.getMessage());
             System.out.println(ex.getMessage());
@@ -98,32 +96,13 @@ public class LexicalAnalyzerController {
         }
     }
 
-    private void colorTokens(StyledDocument doc) {
-        for (Token token : tokenizer.getTokens()) {
-            SimpleAttributeSet attrSet = new SimpleAttributeSet();
-            StyleConstants.setForeground(attrSet, getColorForToken(token.token));
-            doc.setCharacterAttributes(token.pos, token.lexeme.length(), attrSet, false);
+    private void displayTokens() {
+        StringBuilder tokensText = new StringBuilder();
+        for (Token tok : tokenizer.getTokens()) {
+            tokensText.append("[Token: ").append(tok.token)
+                    .append(" Lexema: ").append(tok.lexeme)
+                    .append(" Posicion: ").append(tok.pos).append("]\n");
         }
-    }
-
-    private Color getColorForToken(int tokenType) {
-        switch (tokenType) {
-            case Token.NEW: return Color.BLUE;
-            case Token.FUNCTION: return Color.MAGENTA;
-            case Token.TITULO:
-            case Token.FECHAINICIO:
-            case Token.FECHAFIN:
-            case Token.HASTA:
-            case Token.UBICACION:
-            case Token.DESCRIPCION:
-            case Token.COLOR: return Color.ORANGE;
-            case Token.DOBLE_DOT:
-            case Token.OPEN_BRACKET:
-            case Token.CLOSE_BRACKET:
-            case Token.COMMA: return Color.RED;
-            case Token.DATE: return Color.GREEN;
-            case Token.STRING: return Color.DARK_GRAY;
-            default: return Color.BLACK;
-        }
+        view.tokensArea.setText(tokensText.toString());
     }
 }
