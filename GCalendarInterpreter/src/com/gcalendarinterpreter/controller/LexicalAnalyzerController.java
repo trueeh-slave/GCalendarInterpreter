@@ -4,6 +4,7 @@ package com.gcalendarinterpreter.controller;
 import com.gcalendarinterpreter.model.Token;
 import com.gcalendarinterpreter.model.Tokenizer;
 import com.gcalendarinterpreter.model.exceptions.LexerException;
+import com.gcalendarinterpreter.parser.Parser;
 import com.gcalendarinterpreter.view.LexicalAnalyzerView;
 
 import javax.swing.*;
@@ -18,48 +19,38 @@ import java.io.IOException;
 public class LexicalAnalyzerController {
     private LexicalAnalyzerView view;
     private Tokenizer tokenizer;
+    private Parser parser;
 
     public LexicalAnalyzerController(LexicalAnalyzerView view) {
         this.view = view;
         this.tokenizer = new Tokenizer();
+        this.parser = new Parser();
         configureTokenizer();
         initController();
     }
 
+
     private void configureTokenizer() {
         tokenizer.add("\\bnew\\b", Token.NEW);
-        tokenizer.add("\\bEvento\\b", Token.FUNCTION);
-        tokenizer.add("\\bTarea\\b", Token.FUNCTION);
+        tokenizer.add("\\bEvento\\b", Token.EVENTO);
+        tokenizer.add("\\bTarea\\b", Token.EVENTO);
         tokenizer.add("\\bTitulo\\b", Token.TITULO);
         tokenizer.add("\\bFechaInicio\\b", Token.FECHAINICIO);
         tokenizer.add("\\bFechaFin\\b", Token.FECHAFIN);
-        tokenizer.add("\\bHasta\\b", Token.HASTA);
         tokenizer.add("\\bUbicacion\\b", Token.UBICACION);
         tokenizer.add("\\bDescripcion\\b", Token.DESCRIPCION);
         tokenizer.add("\\bColor\\b", Token.COLOR);
         tokenizer.add(":", Token.DOBLE_DOT);
-        tokenizer.add("\\[", Token.OPEN_BRACKET);
-        tokenizer.add("]", Token.CLOSE_BRACKET);
-        tokenizer.add(",", Token.COMMA);
-        tokenizer.add("\\b(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\\d{2} ([01][0-9]|2[0-3]):[0-5][0-9]\\b", Token.DATE);
-        tokenizer.add("[“\"][^“”\"]*[”\"]", Token.STRING);
-        tokenizer.add("#[0-9a-fA-F]{6}\\b", Token.COLOR);
+        tokenizer.add("(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\\d{4}", Token.DATE);
+        tokenizer.add("(?:[01]\\d|2[0-3]):[0-5]\\d", Token.HOUR);
+        tokenizer.add("\"[^\"]*\"", Token.STRING);
+        tokenizer.add("[|]", Token.SEPARATOR);
     }
 
     private void initController() {
-        view.compileButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                compileText();
-            }
-        });
+        view.compileButton.addActionListener(e -> compileText());
 
-        view.uploadButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                uploadFile();
-            }
-        });
+        view.uploadButton.addActionListener(e -> uploadFile());
     }
 
     private void compileText() {
@@ -70,12 +61,14 @@ public class LexicalAnalyzerController {
         try {
             tokenizer.tokenize(text);
             view.resultLabel.setText("Sintaxis correcta");
-            displayTokens();
+            parseTokens();
         } catch (LexerException ex) {
             view.resultLabel.setText("Sintaxis incorrecta: " + ex.getMessage());
             System.out.println(ex.getMessage());
         }
     }
+
+
 
     private void uploadFile() {
         JFileChooser fileChooser = new JFileChooser();
@@ -96,7 +89,7 @@ public class LexicalAnalyzerController {
         }
     }
 
-    private void displayTokens() {
+    private void parseTokens() {
         StringBuilder tokensText = new StringBuilder();
         for (Token tok : tokenizer.getTokens()) {
             tokensText.append("[Token: ").append(tok.token)
@@ -104,5 +97,13 @@ public class LexicalAnalyzerController {
                     .append(" Posicion: ").append(tok.pos).append("]\n");
         }
         view.tokensArea.setText(tokensText.toString());
+
+        parser.parse(tokenizer.getTokens());
+
+        String parsingSteps = parser.getParsingSteps();
+        view.tokensArea.setText(parsingSteps);
     }
+
+
+
 }
