@@ -1,16 +1,13 @@
 
 package com.gcalendarinterpreter.controller;
 
-import com.gcalendarinterpreter.model.Token;
-import com.gcalendarinterpreter.model.Tokenizer;
-import com.gcalendarinterpreter.model.exceptions.LexerException;
-import com.gcalendarinterpreter.parser.Parser;
+import com.gcalendarinterpreter.ast.Token;
+import com.gcalendarinterpreter.ast.Tokenizer;
+import com.gcalendarinterpreter.ast.exceptions.LexerException;
 import com.gcalendarinterpreter.view.LexicalAnalyzerView;
 
 import javax.swing.*;
 import javax.swing.text.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -19,12 +16,10 @@ import java.io.IOException;
 public class LexicalAnalyzerController {
     private LexicalAnalyzerView view;
     private Tokenizer tokenizer;
-    private Parser parser;
 
     public LexicalAnalyzerController(LexicalAnalyzerView view) {
         this.view = view;
         this.tokenizer = new Tokenizer();
-        this.parser = new Parser();
         configureTokenizer();
         initController();
     }
@@ -98,9 +93,6 @@ public class LexicalAnalyzerController {
         }
         view.tokensArea.setText(tokensText.toString());
 
-        parser.parse(tokenizer.getTokens());
-
-        String parsingSteps = parser.getParsingSteps();
         view.tokensArea.setText(parsingSteps);
     }
 

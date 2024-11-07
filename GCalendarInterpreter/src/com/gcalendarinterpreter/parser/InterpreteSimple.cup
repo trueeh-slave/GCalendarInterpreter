@@ -1,0 +1,78 @@
+package com.gcalendarinterpreter.view;
+
+
+import java_cup.runtime.*;
+import java.util.HashMap;
+import java.util.Map;
+
+parser code {:
+
+  SymbolTable st = new SymbolTable();
+
+:};
+
+/* Terminales */
+terminal String STRING_LITERAL, FECHA_LITERAL, HORA_LITERAL;
+terminal String new, Evento, Titulo, FechaInicio, FechaFin, Ubicacion, Descripcion, dos_puntos;
+
+/* No terminales */
+non terminal Evento EVENTO;
+non terminal Titulo TITULO;
+non terminal FechaInicio FECHAINICIO;
+non terminal FechaFin FECHAFIN;
+non terminal Ubicacion UBICACION;
+non terminal Descripcion DESCRIPCION;
+non terminal Program PROGRAMA;
+non terminal InstructionsList INSTRUCCIONES;
+
+/* Axioma */
+start with PROGRAMA;
+
+/* Reglas de producción */
+PROGRAMA ::= INSTRUCCIONES:i
+             {: RESULT = i; :}
+             ;
+
+INSTRUCCIONES ::= INSTRUCCIONES:l EVENTO:e
+                  {: RESULT = new InstructionsList(l, e); :}
+                | EVENTO:e
+                  {: RESULT = new InstructionsList(e); :}
+                ;
+
+EVENTO ::= new Evento dos_puntos TITULO:t FECHAINICIO:fi FECHAFIN:ff UBICACION:u DESCRIPCION:d
+          {:
+              st.enter(new Symbol("Evento", "Evento", null));
+              RESULT = new Evento($t, $fi, $ff, $u, $d);
+          :};
+
+TITULO ::= Titulo dos_puntos STRING_LITERAL:s
+           {:
+               st.enter(new Symbol("Titulo", "STRING", $s));
+               RESULT = new Titulo($s);
+           :};
+
+FECHAINICIO ::= FechaInicio dos_puntos FECHA_LITERAL:f HORA_LITERAL:h
+               {:
+                   String fechaHora = h + " | " + f;
+                   st.enter(new Symbol("FechaInicio", "FechaHora", fechaHora));
+                   RESULT = new FechaInicio(fechaHora);
+               :};
+
+FECHAFIN ::= FechaFin dos_puntos FECHA_LITERAL:f HORA_LITERAL:h
+             {:
+                 String fechaHora = h + " | " + f;
+                 st.enter(new Symbol("FechaFin", "FechaHora", fechaHora));
+                 RESULT = new FechaFin(fechaHora);
+             :};
+
+UBICACION ::= Ubicacion dos_puntos STRING_LITERAL:s
+              {:
+                  st.enter(new Symbol("Ubicacion", "STRING", s));
+                  RESULT = new Ubicacion(s);
+              :};
+
+DESCRIPCION ::= Descripcion dos_puntos STRING_LITERAL:s
+                {:
+                    st.enter(new Symbol("Descripcion", "STRING", s));
+                    RESULT = new Descripcion(s);
+                :};
