@@ -1,14 +1,11 @@
-package com.gcalendarinterpreter.view;
-
+package com.gcalendarinterpreter;
 
 import java_cup.runtime.*;
 import java.util.HashMap;
 import java.util.Map;
 
 parser code {:
-
   SymbolTable st = new SymbolTable();
-
 :};
 
 /* Terminales */
@@ -30,25 +27,25 @@ start with PROGRAMA;
 
 /* Reglas de producción */
 PROGRAMA ::= INSTRUCCIONES:i
-             {: RESULT = i; :}
+             {: RESULT = new Program(i); :}
              ;
 
-INSTRUCCIONES ::= INSTRUCCIONES:l EVENTO:e
-                  {: RESULT = new InstructionsList(l, e); :}
-                | EVENTO:e
+INSTRUCCIONES ::= EVENTO:e
                   {: RESULT = new InstructionsList(e); :}
+                | INSTRUCCIONES:l EVENTO:e
+                  {: RESULT = new InstructionsList(l, e); :}
                 ;
 
 EVENTO ::= new Evento dos_puntos TITULO:t FECHAINICIO:fi FECHAFIN:ff UBICACION:u DESCRIPCION:d
           {:
               st.enter(new Symbol("Evento", "Evento", null));
-              RESULT = new Evento($t, $fi, $ff, $u, $d);
+              RESULT = new Evento(t, fi, ff, u, d);
           :};
 
 TITULO ::= Titulo dos_puntos STRING_LITERAL:s
            {:
-               st.enter(new Symbol("Titulo", "STRING", $s));
-               RESULT = new Titulo($s);
+               st.enter(new Symbol("Titulo", "STRING", s));
+               RESULT = new Titulo(s);
            :};
 
 FECHAINICIO ::= FechaInicio dos_puntos FECHA_LITERAL:f HORA_LITERAL:h

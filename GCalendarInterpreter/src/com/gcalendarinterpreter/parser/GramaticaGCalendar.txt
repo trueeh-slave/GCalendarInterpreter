@@ -1,8 +1,8 @@
 G = (
     NT = { <Evento>, <Titulo>, <FechaInicio>, <FechaFin>, <Ubicacion>, <Descripcion>, <Color> }
     
-    T = { "new", "Evento" ":", "Titulo", "FechaInicio", "FechaFin", "Ubicacion", "Descripcion", "Color", 
-          STRING_LITERAL, STRING_LITERAL, FECHA_LITERAL, HORA_LITERAL}
+    T = { "new", "Evento" ":", "Titulo", "FechaInicio", "FechaFin", "Ubicacion", "Descripcion", " | ",
+          STRING_LITERAL, FECHA_LITERAL, HORA_LITERAL}
 
     Axioma = <Evento>
 
@@ -10,10 +10,9 @@ G = (
         <Evento>              ::= new Evento: <Titulo> <FechaInicio> <FechaFin> <Ubicacion> <Descripcion> <Color>
         <Titulo>              ::= Titulo: STRING_LITERAL
         <FechaInicio>         ::= FechaInicio: FECHA_LITERAL HORA_LITERAL
-        <FechaFin>            ::= FechaFin: FECHA_LITERAL HORA_LITERAL
+        <FechaFin>            ::= FechaFin: FECHA_LITERAL " | " HORA_LITERAL
         <Ubicacion>           ::= Ubicacion: STRING_LITERAL
         <Descripcion>         ::= Descripcion: STRING_LITERAL
-        <Color>               ::= Color: STRING_LITERAL
         <String>              ::= STRING_LITERAL
         <Fecha>               ::= FECHA_LITERAL
 	    <Hora>                ::= HORA_LITERAL
